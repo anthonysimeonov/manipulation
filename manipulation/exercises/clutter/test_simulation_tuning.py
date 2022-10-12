@@ -204,3 +204,45 @@ class TestSimulationTuning(unittest.TestCase):
         print(f'List of contacts: {n_contacts_list}')
 
         self.assertTrue((np.array(n_contacts) > 0).all(), 'Objects not contacting!')
+
+    @weight(1)
+    def test_force_discontinuity(self):
+        """Test test_force_discontinuity"""
+        plant = self.notebook_locals["plant551"]
+        diagram = self.notebook_locals["diagram551"]
+        f = self.notebook_locals["set_block_2d_poses"]
+
+        box1_pos1, box2_pos1, box1_pos2, box2_pos2 = f()
+
+        context = diagram.CreateDefaultContext()
+        plant_context = plant.GetMyContextFromRoot(context)
+
+        plant.SetPositions(plant_context, np.concatenate([box1_pos1 + box2_pos1])) 
+
+        contact_port = plant.get_contact_results_output_port()
+        contact_results = plant.get_contact_results_output_port().Eval(plant_context)
+        n_contacts = contact_results.num_point_pair_contacts()
+        info = contact_results.point_pair_contact_info(0)
+        normal_1 = info.contact_force()
+        point_1 = info.contact_point()
+        print(f'Normal 1: {normal_1}\nContact point 1: {point_1}\n\n')
+
+        plant.SetPositions(plant_context, np.concatenate([box1_pos2 + box2_pos2]))
+
+        contact_port = plant.get_contact_results_output_port()
+        contact_results = plant.get_contact_results_output_port().Eval(plant_context)
+        n_contacts = contact_results.num_point_pair_contacts()
+        info = contact_results.point_pair_contact_info(0)
+        normal_2 = info.contact_force()
+        point_2 = info.contact_point()
+        print(f'Normal 2: {normal_2}\nContact point 2: {point_2}\n\n')
+
+        contact_pt_dist = np.linalg.norm(point_1 - point_2)
+        force_angle = np.arccos(np.dot(normal_1, normal_2))
+        print(f'Contact point dist: {contact_pt_dist:5f}\nAngle between forces: {force_angle:5f}\n\n')
+
+        close_pts = contact_pt_dist < 0.01
+        self.assertTrue(close_pts, 'Contact points not close enough, discontinuity not detected') 
+
+        large_angle = force_angle > np.deg2rad(60)
+        self.assertTrue(large_angle, 'Angle between force vectors too small, discontinuity not detected')
