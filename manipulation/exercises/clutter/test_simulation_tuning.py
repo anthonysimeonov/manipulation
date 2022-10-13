@@ -13,11 +13,11 @@ class TestSimulationTuning(unittest.TestCase):
         self.notebook_locals = notebook_locals
 
     @timeout_decorator.timeout(10.)
-    @weight(1)
+    @weight(2)
     def test_on_slope(self):
         """Test test_on_slope"""
-        simulator = self.notebook_locals["simulator552a"]
-        diagram = self.notebook_locals["diagram552a"]
+        simulator = self.notebook_locals["simulator_d"]
+        diagram = self.notebook_locals["diagram_d"]
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName('plant')
@@ -45,11 +45,11 @@ class TestSimulationTuning(unittest.TestCase):
                         'Final box positions not in correct range!')
 
     @timeout_decorator.timeout(10.)
-    @weight(1)
+    @weight(2)
     def test_make_simulation(self):
         """Test test_make_simulation"""
-        simulator = self.notebook_locals["simulator552c"]
-        diagram = self.notebook_locals["diagram552c"]
+        simulator = self.notebook_locals["simulator_f"]
+        diagram = self.notebook_locals["diagram_f"]
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName('plant')
@@ -85,11 +85,11 @@ class TestSimulationTuning(unittest.TestCase):
                         'Final box positions not in correct range!')
 
     @timeout_decorator.timeout(10.)
-    @weight(1)
+    @weight(3)
     def test_make_stacking_simulation(self):
         """Test test_make_stacking_simulation"""
-        simulator = self.notebook_locals["simulator553"]
-        diagram = self.notebook_locals["diagram553"]
+        simulator = self.notebook_locals["simulator_h"]
+        diagram = self.notebook_locals["diagram_h"]
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName('plant')
@@ -124,11 +124,11 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue(in_range_all.all(),
                         'Final box positions not in correct range!')
 
-    @weight(1)
+    @weight(2)
     def test_matching_coll_shape(self):
         """Test test_matching_coll_shape"""
-        plant = self.notebook_locals["plant551"]
-        diagram = self.notebook_locals["diagram551"]
+        plant = self.notebook_locals["plant_a"]
+        diagram = self.notebook_locals["diagram_a"]
 
         context = diagram.CreateDefaultContext()
         plant_context = plant.GetMyContextFromRoot(context)
@@ -155,11 +155,11 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue((np.array(n_contacts) > 0).all(),
                         'Objects not contacting!')
 
-    @weight(1)
+    @weight(2)
     def test_force_discontinuity(self):
         """Test test_force_discontinuity"""
-        plant = self.notebook_locals["plant551"]
-        diagram = self.notebook_locals["diagram551"]
+        plant = self.notebook_locals["plant_a"]
+        diagram = self.notebook_locals["diagram_a"]
         f = self.notebook_locals["set_block_2d_poses"]
 
         box1_pos1, box2_pos1, box1_pos2, box2_pos2 = f()
@@ -198,11 +198,11 @@ class TestSimulationTuning(unittest.TestCase):
             force_angle, np.deg2rad(60),
             'Angle between force vectors too small, discontinuity not detected')
 
-    @weight(1)
+    @weight(2)
     def test_multi_contact(self):
         """Test test_multi_contact"""
-        simulator = self.notebook_locals["simulator552b"]
-        diagram = self.notebook_locals["diagram552b"]
+        simulator = self.notebook_locals["simulator_e"]
+        diagram = self.notebook_locals["diagram_e"]
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName('plant')
@@ -215,15 +215,9 @@ class TestSimulationTuning(unittest.TestCase):
 
         self.assertGreater(n_contacts, 2, 'Not enough contacts detected!')
 
-    @weight(1)
+    @weight(2)
     def test_minimal_rotation(self):
         """Test test_minimal_rotation"""
-        # simulator = self.notebook_locals["simulator552b"]
-        # diagram = self.notebook_locals["diagram552b"]
-
-        # f = self.notebook_locals["make_simulation"]
-        # f = self.notebook_locals["sim_maker.make_simulation"]
-        
         sim_maker = self.notebook_locals["sim_maker"]
         f = sim_maker.make_simulation
         simulator, diagram = f(0.001, (1, 1), (0.1, 0.1))
