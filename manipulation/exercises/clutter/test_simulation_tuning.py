@@ -3,7 +3,7 @@ import timeout_decorator
 from gradescope_utils.autograder_utils.decorators import weight
 import numpy as np
 import os
-from pydrake.all import (RigidTransform, RollPitchYaw, BodyIndex)
+from pydrake.all import (RigidTransform, RollPitchYaw, BodyIndex, RotationMatrix)
 
 
 class TestSimulationTuning(unittest.TestCase):
@@ -75,13 +75,13 @@ class TestSimulationTuning(unittest.TestCase):
         print(f'Box 1: {box1_pos}')
         print(f'Box 2: {box2_pos}')
 
-        # box1_frame = plant.GetBodyByName('box').body_frame()
-        # box2_frame = plant.GetBodyByName('box_2').body_frame()
+        box1_frame = plant.GetBodyByName('box').body_frame()
+        box2_frame = plant.GetBodyByName('box_2').body_frame()
 
-        # box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        # box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        # print(f'Box 1 pose: {box1_pose}')
-        # print(f'Box 2 pose: {box2_pose}')
+        box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        print(f'Box 1 pose: {box1_pose}')
+        print(f'Box 2 pose: {box2_pose}')
 
         box_pos_range = np.array([
             [0.0, 1.0], 
@@ -120,13 +120,13 @@ class TestSimulationTuning(unittest.TestCase):
         print(f'Box 1: {box1_pos}')
         print(f'Box 2: {box2_pos}')
 
-        # box1_frame = plant.GetBodyByName('box').body_frame()
-        # box2_frame = plant.GetBodyByName('box_2').body_frame()
+        box1_frame = plant.GetBodyByName('box').body_frame()
+        box2_frame = plant.GetBodyByName('box_2').body_frame()
 
-        # box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        # box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        # print(f'Box 1 pose: {box1_pose}')
-        # print(f'Box 2 pose: {box2_pose}')
+        box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        print(f'Box 1 pose: {box1_pose}')
+        print(f'Box 2 pose: {box2_pose}')
 
         # # box1_frame = plant.get_body(1).body_frame()
         # # box2_frame = plant.get_body(2).body_frame()
@@ -241,8 +241,56 @@ class TestSimulationTuning(unittest.TestCase):
         force_angle = np.arccos(np.dot(normal_1, normal_2))
         print(f'Contact point dist: {contact_pt_dist:5f}\nAngle between forces: {force_angle:5f}\n\n')
 
-        close_pts = contact_pt_dist < 0.01
-        self.assertTrue(close_pts, 'Contact points not close enough, discontinuity not detected') 
+        # close_pts = contact_pt_dist < 0.01
+        # self.assertTrue(close_pts, 'Contact points not close enough, discontinuity not detected') 
+        self.assertLessEqual(contact_pt_dist, 0.01, 'Contact points not close enough, discontinuity not detected') 
 
-        large_angle = force_angle > np.deg2rad(60)
-        self.assertTrue(large_angle, 'Angle between force vectors too small, discontinuity not detected')
+        # large_angle = force_angle > np.deg2rad(60)
+        # self.assertTrue(large_angle, 'Angle between force vectors too small, discontinuity not detected')
+        self.assertGreaterEqual(force_angle, np.deg2rad(60), 'Angle between force vectors too small, discontinuity not detected')
+
+    @weight(1)
+    def test_multi_contact(self):
+        """Test test_multi_contact"""
+        simulator = self.notebook_locals["simulator552b"]
+        diagram = self.notebook_locals["diagram552b"]
+
+        context = simulator.get_context()
+        plant = diagram.GetSubsystemByName('plant')
+        plant_context = plant.GetMyMutableContextFromRoot(context)
+
+        contact_port = plant.get_contact_results_output_port()
+        contact_results = plant.get_contact_results_output_port().Eval(plant_context)
+        n_contacts = contact_results.num_point_pair_contacts()
+        print(f'Number of contacts: {n_contacts}')
+
+        self.assertGreater(n_contacts, 2, 'Not enough contacts detected!')
+
+
+    @weight(1)
+    def test_minimal_rotation(self):
+        """Test test_minimal_rotation"""
+        simulator = self.notebook_locals["simulator552b"]
+        diagram = self.notebook_locals["diagram552b"]
+
+        context = simulator.get_context()
+        plant = diagram.GetSubsystemByName('plant')
+        plant_context = plant.GetMyMutableContextFromRoot(context)
+
+        box1_frame = plant.GetBodyByName('box').body_frame()
+        box2_frame = plant.GetBodyByName('box_2').body_frame()
+
+        box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        print(f'Box 1 pose: {box1_pose}')
+        print(f'Box 2 pose: {box2_pose}')
+        
+        final_rot = box2_frame.CalcPoseInWorld(plant_context).rotation()
+        expected_rot = RotationMatrix.MakeYRotation(0.1 + np.pi/2)
+
+        rot_diff = final_rot.inverse() @ expected_rot
+
+        diff_norm = np.linalg.norm(rot_diff.matrix() - np.eye(3))
+
+        self.assertLessEqual(diff_norm, 0.1, 'Box 2 moved more than expected!')
+
