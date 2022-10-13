@@ -218,8 +218,15 @@ class TestSimulationTuning(unittest.TestCase):
     @weight(1)
     def test_minimal_rotation(self):
         """Test test_minimal_rotation"""
-        simulator = self.notebook_locals["simulator552b"]
-        diagram = self.notebook_locals["diagram552b"]
+        # simulator = self.notebook_locals["simulator552b"]
+        # diagram = self.notebook_locals["diagram552b"]
+
+        # f = self.notebook_locals["make_simulation"]
+        # f = self.notebook_locals["sim_maker.make_simulation"]
+        
+        sim_maker = self.notebook_locals["sim_maker"]
+        f = sim_maker.make_simulation
+        simulator, diagram = f(0.001, (1, 1), (0.1, 0.1))
 
         context = simulator.get_context()
         plant = diagram.GetSubsystemByName('plant')
