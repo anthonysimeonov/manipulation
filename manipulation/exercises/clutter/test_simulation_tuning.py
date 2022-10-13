@@ -12,7 +12,7 @@ class TestSimulationTuning(unittest.TestCase):
         super().__init__(test_name)
         self.notebook_locals = notebook_locals
 
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(2.)
     @weight(2)
     def test_on_slope(self):
         """Test test_on_slope"""
@@ -44,7 +44,7 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue(in_range_all.all(),
                         'Final box positions not in correct range!')
 
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(2.)
     @weight(2)
     def test_make_simulation(self):
         """Test test_make_simulation"""
@@ -84,7 +84,7 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue(in_range_all.all(),
                         'Final box positions not in correct range!')
 
-    @timeout_decorator.timeout(10.)
+    @timeout_decorator.timeout(2.)
     @weight(3)
     def test_make_stacking_simulation(self):
         """Test test_make_stacking_simulation"""
@@ -124,6 +124,7 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue(in_range_all.all(),
                         'Final box positions not in correct range!')
 
+    @timeout_decorator.timeout(2.)
     @weight(2)
     def test_matching_coll_shape(self):
         """Test test_matching_coll_shape"""
@@ -155,6 +156,7 @@ class TestSimulationTuning(unittest.TestCase):
         self.assertTrue((np.array(n_contacts) > 0).all(),
                         'Objects not contacting!')
 
+    @timeout_decorator.timeout(2.)
     @weight(2)
     def test_force_discontinuity(self):
         """Test test_force_discontinuity"""
@@ -198,6 +200,7 @@ class TestSimulationTuning(unittest.TestCase):
             force_angle, np.deg2rad(60),
             'Angle between force vectors too small, discontinuity not detected')
 
+    @timeout_decorator.timeout(2.)
     @weight(2)
     def test_multi_contact(self):
         """Test test_multi_contact"""
@@ -215,6 +218,7 @@ class TestSimulationTuning(unittest.TestCase):
 
         self.assertGreater(n_contacts, 2, 'Not enough contacts detected!')
 
+    @timeout_decorator.timeout(2.)
     @weight(2)
     def test_minimal_rotation(self):
         """Test test_minimal_rotation"""
@@ -232,7 +236,6 @@ class TestSimulationTuning(unittest.TestCase):
         expected_rot = RotationMatrix.MakeYRotation(0.1 + np.pi / 2)
 
         rot_diff = final_rot.inverse() @ expected_rot
-
         diff_norm = np.linalg.norm(rot_diff.matrix() - np.eye(3))
 
         self.assertLessEqual(diff_norm, 0.1, 'Box 2 moved more than expected!')
