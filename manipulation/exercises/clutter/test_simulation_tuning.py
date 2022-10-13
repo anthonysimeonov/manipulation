@@ -16,10 +16,6 @@ class TestSimulationTuning(unittest.TestCase):
     @weight(1)
     def test_on_slope(self):
         """Test test_on_slope"""
-        # part a. -- check if object is on slope
-        # set_hyp = self.notebook_locals["set_hyperparameter_552"]
-        # make_simulation = self.notebook_locals["make_simulation"]
-        # simulator, diagram = make_simulation(*set_hyp())
         simulator = self.notebook_locals["simulator552a"]
         diagram = self.notebook_locals["diagram552a"]
 
@@ -29,16 +25,6 @@ class TestSimulationTuning(unittest.TestCase):
         box_poses = plant.GetPositions(plant_context)
         box1_pos = box_poses[:7][4:]
         box2_pos = box_poses[7:][4:]
-        print(f'Box 1: {box1_pos}')
-        print(f'Box 2: {box2_pos}')
-
-        # box1_frame = plant.GetBodyByName('box').body_frame()
-        # box2_frame = plant.GetBodyByName('box_2').body_frame()
-
-        # box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        # box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        # print(f'Box 1 pose: {box1_pose}')
-        # print(f'Box 2 pose: {box1_pose}')
 
         box_pos_range = np.array([
             [0.0, 1.0],
@@ -59,10 +45,9 @@ class TestSimulationTuning(unittest.TestCase):
                         'Final box positions not in correct range!')
 
     @timeout_decorator.timeout(10.)
-    @weight(3)
+    @weight(1)
     def test_make_simulation(self):
         """Test test_make_simulation"""
-        # part c. --  check if objects are in desired final range
         simulator = self.notebook_locals["simulator552c"]
         diagram = self.notebook_locals["diagram552c"]
 
@@ -72,16 +57,14 @@ class TestSimulationTuning(unittest.TestCase):
         box_poses = plant.GetPositions(plant_context)
         box1_pos = box_poses[:7][4:]
         box2_pos = box_poses[7:][4:]
-        print(f'Box 1: {box1_pos}')
-        print(f'Box 2: {box2_pos}')
 
-        box1_frame = plant.GetBodyByName('box').body_frame()
-        box2_frame = plant.GetBodyByName('box_2').body_frame()
+        # box1_frame = plant.GetBodyByName('box').body_frame()
+        # box2_frame = plant.GetBodyByName('box_2').body_frame()
 
-        box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        print(f'Box 1 pose: {box1_pose}')
-        print(f'Box 2 pose: {box2_pose}')
+        # box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        # box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        # print(f'Box 1 pose: {box1_pose}')
+        # print(f'Box 2 pose: {box2_pose}')
 
         box_pos_range = np.array([
             [0.0, 1.0],
@@ -102,13 +85,9 @@ class TestSimulationTuning(unittest.TestCase):
                         'Final box positions not in correct range!')
 
     @timeout_decorator.timeout(10.)
-    @weight(3)
+    @weight(1)
     def test_make_stacking_simulation(self):
         """Test test_make_stacking_simulation"""
-        # 5.3.3 -- check if objects are stacked + at desired range
-        # set_hyp = self.notebook_locals["set_hyperparameter_552"]
-        # make_simulation = self.notebook_locals["make_simulation"]
-        # simulator, diagram = make_simulation(*set_hyp())
         simulator = self.notebook_locals["simulator553"]
         diagram = self.notebook_locals["diagram553"]
 
@@ -118,16 +97,14 @@ class TestSimulationTuning(unittest.TestCase):
         box_poses = plant.GetPositions(plant_context)
         box1_pos = box_poses[:7][4:]
         box2_pos = box_poses[7:][4:]
-        print(f'Box 1: {box1_pos}')
-        print(f'Box 2: {box2_pos}')
 
-        box1_frame = plant.GetBodyByName('box').body_frame()
-        box2_frame = plant.GetBodyByName('box_2').body_frame()
+        # box1_frame = plant.GetBodyByName('box').body_frame()
+        # box2_frame = plant.GetBodyByName('box_2').body_frame()
 
-        box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        print(f'Box 1 pose: {box1_pose}')
-        print(f'Box 2 pose: {box2_pose}')
+        # box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        # box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
+        # print(f'Box 1 pose: {box1_pose}')
+        # print(f'Box 2 pose: {box2_pose}')
 
         box1_pos_range = np.array([[0.2, 0.3], [-0.025, 0.025], [0.025,
                                                                  0.0375]])
@@ -140,8 +117,6 @@ class TestSimulationTuning(unittest.TestCase):
                                                                              1]
             in_range_2 = box2_pos_range[i, 0] < box2_pos[i] < box2_pos_range[i,
                                                                              1]
-            # print(f'Box 1: {box1_pos[i]}, Box 2: {box2_pos[i]}')
-            # print(f'In 1: {in_range_1}, In 2: {in_range_2}')
             in_range_list1.append(in_range_1)
             in_range_list2.append(in_range_2)
 
@@ -160,7 +135,6 @@ class TestSimulationTuning(unittest.TestCase):
         contact_results = plant.get_contact_results_output_port().Eval(
             plant_context)
 
-        # we can use these positions to test corner overlap
         box_q_list = np.array([[0., 0.15, 0.], [0., 0.2, 0.], [0., 0.2, 0.],
                                [0., 0.13, 0.]])
 
@@ -169,18 +143,14 @@ class TestSimulationTuning(unittest.TestCase):
 
         n_contacts_list = []
         for i in range(4):
-            plant.SetPositions(
-                plant_context, np.concatenate([
-                    box_q_list[i], box2_q_list[i]
-                ]))  # TODO: how to set the joint positions properly?
+            plant.SetPositions(plant_context,
+                               np.concatenate([box_q_list[i], box2_q_list[i]]))
 
             contact_results = plant.get_contact_results_output_port().Eval(
                 plant_context)
             n_contacts = contact_results.num_point_pair_contacts()
 
             n_contacts_list.append(n_contacts)
-
-        print(f'List of contacts: {n_contacts_list}')
 
         self.assertTrue((np.array(n_contacts) > 0).all(),
                         'Objects not contacting!')
@@ -203,11 +173,9 @@ class TestSimulationTuning(unittest.TestCase):
         contact_port = plant.get_contact_results_output_port()
         contact_results = plant.get_contact_results_output_port().Eval(
             plant_context)
-        n_contacts = contact_results.num_point_pair_contacts()
         info = contact_results.point_pair_contact_info(0)
         normal_1 = info.contact_force()
         point_1 = info.contact_point()
-        print(f'Normal 1: {normal_1}\nContact point 1: {point_1}\n\n')
 
         plant.SetPositions(plant_context,
                            np.concatenate([box1_pos2 + box2_pos2]))
@@ -215,18 +183,12 @@ class TestSimulationTuning(unittest.TestCase):
         contact_port = plant.get_contact_results_output_port()
         contact_results = plant.get_contact_results_output_port().Eval(
             plant_context)
-        n_contacts = contact_results.num_point_pair_contacts()
         info = contact_results.point_pair_contact_info(0)
         normal_2 = info.contact_force()
         point_2 = info.contact_point()
-        print(f'Normal 2: {normal_2}\nContact point 2: {point_2}\n\n')
 
         contact_pt_dist = np.linalg.norm(point_1 - point_2)
         force_angle = np.arccos(np.dot(normal_1, normal_2))
-        # print(
-        #     f'Contact point dist: {contact_pt_dist:5f}\n
-        #       Angle between forces: {force_angle:5f}\n\n'
-        # )
 
         self.assertLessEqual(
             contact_pt_dist, 0.01,
@@ -250,7 +212,6 @@ class TestSimulationTuning(unittest.TestCase):
         contact_results = plant.get_contact_results_output_port().Eval(
             plant_context)
         n_contacts = contact_results.num_point_pair_contacts()
-        print(f'Number of contacts: {n_contacts}')
 
         self.assertGreater(n_contacts, 2, 'Not enough contacts detected!')
 
@@ -264,13 +225,7 @@ class TestSimulationTuning(unittest.TestCase):
         plant = diagram.GetSubsystemByName('plant')
         plant_context = plant.GetMyMutableContextFromRoot(context)
 
-        box1_frame = plant.GetBodyByName('box').body_frame()
         box2_frame = plant.GetBodyByName('box_2').body_frame()
-
-        box1_pose = box1_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        box2_pose = box2_frame.CalcPoseInWorld(plant_context).GetAsMatrix4()
-        print(f'Box 1 pose: {box1_pose}')
-        print(f'Box 2 pose: {box2_pose}')
 
         final_rot = box2_frame.CalcPoseInWorld(plant_context).rotation()
         expected_rot = RotationMatrix.MakeYRotation(0.1 + np.pi / 2)
